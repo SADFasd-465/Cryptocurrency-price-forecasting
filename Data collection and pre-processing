@@ -1,0 +1,8 @@
+import yfinance as yf
+import pandas as pd
+
+# Получаем исторические данные для биткойна
+data = yf.download("BTC-USD", start="2017-01-01", end="2025-01-01")
+
+# Посмотрим на структуру данных
+data.head()
