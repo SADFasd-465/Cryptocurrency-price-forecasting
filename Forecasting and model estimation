@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
 # Прогнозируем на тестовых данных
 y_pred = model.predict(X_test)
 
@@ -5,13 +8,29 @@ y_pred = model.predict(X_test)
 y_pred = scaler.inverse_transform(y_pred)
 y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
 
-# Выводим результат
-import matplotlib.pyplot as plt
+# Создаем ось X с временными метками для отображения
+time = np.arange(len(y_test))
 
-plt.plot(y_test, color='blue', label='Real BTC Price')
-plt.plot(y_pred, color='red', label='Predicted BTC Price')
-plt.title('BTC Price Prediction')
-plt.xlabel('Time')
-plt.ylabel('BTC Price')
-plt.legend()
+# Плотим реальные данные и предсказанные
+plt.figure(figsize=(14, 8))
+
+# Реальные значения
+plt.plot(time, y_test, color='blue', label='Real BTC Price', linewidth=2)
+
+# Предсказанные значения
+plt.plot(time, y_pred, color='red', label='Predicted BTC Price', linestyle='--', linewidth=2)
+
+# Визуализируем ошибку (разницу между реальными и предсказанными)
+error = y_test - y_pred
+plt.fill_between(time, y_test.flatten(), y_pred.flatten(), color='gray', alpha=0.2, label="Prediction Error")
+
+# Настройки графика
+plt.title('BTC Price Prediction vs Real Price', fontsize=16)
+plt.xlabel('Time', fontsize=14)
+plt.ylabel('BTC Price (USD)', fontsize=14)
+plt.legend(loc='upper left', fontsize=12)
+plt.grid(True)
+
+# Выводим график
+plt.tight_layout()
 plt.show()
