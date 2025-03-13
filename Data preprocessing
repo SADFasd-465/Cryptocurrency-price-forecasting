@@ -1,0 +1,30 @@
+from sklearn.preprocessing import MinMaxScaler
+import numpy as np
+
+# Используем только цену закрытия
+data = data[['Close']]
+
+# Нормализуем данные
+scaler = MinMaxScaler(feature_range=(0, 1))
+data_scaled = scaler.fit_transform(data)
+
+# Создаем обучающий набор данных
+def create_dataset(data, time_step=60):
+    X, y = [], []
+    for i in range(len(data) - time_step - 1):
+        X.append(data[i:(i + time_step), 0])
+        y.append(data[i + time_step, 0])
+    return np.array(X), np.array(y)
+
+# Создаем обучающие и тестовые данные
+time_step = 60
+X, y = create_dataset(data_scaled, time_step)
+
+# Разбиваем на обучающие и тестовые данные
+train_size = int(len(X) * 0.8)
+X_train, X_test = X[:train_size], X[train_size:]
+y_train, y_test = y[:train_size], y[train_size:]
+
+# Ресайзим данные для подачи в модель
+X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
+X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
