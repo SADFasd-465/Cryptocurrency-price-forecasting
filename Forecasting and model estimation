@@ -1,0 +1,17 @@
+# Прогнозируем на тестовых данных
+y_pred = model.predict(X_test)
+
+# Обратная нормализация прогнозируемых значений
+y_pred = scaler.inverse_transform(y_pred)
+y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
+
+# Выводим результат
+import matplotlib.pyplot as plt
+
+plt.plot(y_test, color='blue', label='Real BTC Price')
+plt.plot(y_pred, color='red', label='Predicted BTC Price')
+plt.title('BTC Price Prediction')
+plt.xlabel('Time')
+plt.ylabel('BTC Price')
+plt.legend()
+plt.show()
