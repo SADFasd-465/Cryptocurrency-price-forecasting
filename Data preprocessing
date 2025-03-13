@@ -1,8 +1,14 @@
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
+import pandas as pd
 
-# Используем только цену закрытия
-data = data[['Close']]
+# Проверка на NaN значения в данных
+if data.isnull().sum().sum() > 0:
+    print("Есть пропущенные значения в данных. Заполняем их...")
+    data = data.fillna(method='ffill')  # Заполнение пропусков методом вперед
+
+# Используем только цену закрытия (или другие столбцы, если нужно)
+data = data[['Close']]  # Можно изменить на ['Open', 'Close', 'High', 'Low', 'Volume'], если есть дополнительные данные
 
 # Нормализуем данные
 scaler = MinMaxScaler(feature_range=(0, 1))
@@ -12,19 +18,22 @@ data_scaled = scaler.fit_transform(data)
 def create_dataset(data, time_step=60):
     X, y = [], []
     for i in range(len(data) - time_step - 1):
-        X.append(data[i:(i + time_step), 0])
-        y.append(data[i + time_step, 0])
+        X.append(data[i:(i + time_step), 0])  # Взятие значений за time_step
+        y.append(data[i + time_step, 0])  # Следующее значение
     return np.array(X), np.array(y)
 
 # Создаем обучающие и тестовые данные
-time_step = 60
+time_step = 60  # Можно делать гибким параметром
 X, y = create_dataset(data_scaled, time_step)
 
 # Разбиваем на обучающие и тестовые данные
-train_size = int(len(X) * 0.8)
+train_size = int(len(X) * 0.8)  # Можно параметризовать
 X_train, X_test = X[:train_size], X[train_size:]
 y_train, y_test = y[:train_size], y[train_size:]
 
-# Ресайзим данные для подачи в модель
-X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
+# Ресайзим данные для подачи в модель LSTM
+X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)  # Массивы 3D для LSTM
 X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
+
+# Выводим информацию о наборе данных
+print(f"Размер обучающих данных: {X_train.shape}, Размер тестовых данных: {X_test.shape}")
